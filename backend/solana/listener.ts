@@ -18,13 +18,13 @@ export function startListener() {
         if (!memoIx) return;
 
         const memo = memoIx.programId
-        const parsed = parseMemo(memoIx.programId);
-        if (!parsed) return;
+        // const parsed = parseMemo(memoIx.programId);
+        // if (!parsed) return;
 
-        storeBet(sig, {
-            ...parsed,
-            signature: sig,
-            player: tx.transaction.message.accountKeys[0].pubkey,
-        });
+        // storeBet(sig, {
+        //     ...parsed,
+        //     signature: sig,
+        //     player: tx.transaction.message.accountKeys[0].pubkey,
+        // });
     });
 }

@@ -115,6 +115,11 @@
   }
 }
 
+/* Compact wallet button for mobile navbar */
+.wallet-mobile .wallet-adapter-button {
+  @apply px-2 py-1 text-[10px] sm:px-3 sm:py-1.5 sm:text-xs md:px-4 md:py-2 md:text-sm;
+}
+
 /* 3D coin perspective */
 .perspective-1000 {
   perspective: 1000px;

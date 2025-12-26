@@ -2,13 +2,13 @@ import { useState, useCallback, useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
 import { BettingPanel } from '@/components/BettingPanel';
 import { FlipHistory } from '@/components/FlipHistory';
 import { ResultModal } from '@/components/ResultModal';
 import { DisclaimerModal } from '@/components/DisclaimerModal';
 import { FlipModal } from '@/components/FlipModal';
 import { motion } from 'framer-motion';
-import { Sparkles } from 'lucide-react';
 import { createAndSignTransfer } from '@/services/solanaTransfer';
 import { submitFlip, fetchBets, Bet } from '@/services/flipApi';
 import { useToast } from '@/hooks/use-toast';
@@ -74,10 +74,10 @@ const Index = () => {
     setCoinResult(null);
 
     try {
-      // 1. Sign and send the transfer transaction
+      // 1. Sign and send the transfer transaction (just the bet amount, fee collected on win)
       const transferResult = await createAndSignTransfer(
         { publicKey, signTransaction },
-        amount + (amount * 0.03),
+        amount,
         choice
       );
 
@@ -116,7 +116,7 @@ const Index = () => {
         setTimeout(() => {
           setShowFlipModal(false);
           setFlipStatus('idle');
-          setLastFlip({ won, amount: won ? amount * 0.97 : amount, result });
+          setLastFlip({ won, amount: won ? amount * 1.94 : amount, result });
           setShowResult(true);
         }, 1500);
       }, 1500);
@@ -142,47 +142,34 @@ const Index = () => {
 
       <Header />
 
-      <main className="relative z-10 pt-24 pb-12 px-4">
-        <div className="container mx-auto max-w-4xl">
-          {/* Hero Section */}
+      <main className="relative z-10 pt-16 md:pt-20 pb-4 md:pb-6 px-4 min-h-[calc(100vh-3.5rem)] md:min-h-[calc(100vh-4rem)] flex flex-col">
+        <div className="container mx-auto max-w-4xl flex-1 flex flex-col">
+          {/* Hero Section - Compact */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-12"
+            className="text-center mb-4 md:mb-6"
           >
-            {/* Devnet Badge */}
-            <motion.div
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.1, type: 'spring' }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 backdrop-blur-sm mb-8 animate-pulse-glow-green"
-            >
-              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="font-semibold text-sm text-emerald-400 tracking-wider uppercase">
-                Running on Devnet
-              </span>
-              <Sparkles className="w-4 h-4 text-emerald-400" />
-            </motion.div>
-
-            <h1 className="text-5xl md:text-7xl font-bold mb-2">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mt-3 mb-1 md:mb-2">
               <span className="bg-gradient-to-r from-primary via-amber-400 to-primary bg-clip-text text-transparent">
-                COINFLIP
+                SOLFLIP
               </span>
             </h1>
-            <p className="text-xl text-primary font-semibold mb-2">Double or Nothing</p>
-            <p className="text-lg text-muted-foreground max-w-md mx-auto">
+            {/* <p className="text-xl md:text-2xl text-primary font-semibold mb-1 md:mb-2">Double or Nothing</p> */}
+            <p className="text-sm md:text-base text-muted-foreground max-w-md mx-auto">
               Flip test SOL. 50/50 odds, instant results.
             </p>
           </motion.div>
 
-          {/* Main Content */}
-          <div className="flex flex-col items-center gap-8">
+          {/* Main Content - Centered */}
+          <div className="flex flex-col items-center gap-4 md:gap-6 flex-1 justify-center">
             {/* Betting Panel or Connect Wallet */}
             {connected ? (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
+                className="w-full max-w-md"
               >
                 <BettingPanel
                   onFlip={handleFlip}
@@ -195,9 +182,9 @@ const Index = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="text-center space-y-6"
+                className="text-center space-y-4"
               >
-                <h2 className="text-2xl font-bold text-foreground">
+                <h2 className="text-xl md:text-2xl font-bold text-foreground">
                   Connect Your Wallet to Begin
                 </h2>
                 <div className="wallet-adapter-button-wrapper flex justify-center">
@@ -206,23 +193,25 @@ const Index = () => {
               </motion.div>
             )}
 
-            {/* Fee Notice */}
-            <p className="text-sm text-muted-foreground">
-              <span className="text-primary font-medium">3% fees</span> apply for every flip • <span className="text-emerald-400">Devnet only</span>
+            {/* Devnet Notice */}
+            <p className="text-xs md:text-sm text-emerald-400/80">
+              Running on Devnet
             </p>
-
-            {/* Flip History */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="w-full"
-            >
-              <FlipHistory history={history} />
-            </motion.div>
           </div>
+
+          {/* Flip History - At bottom, scrollable */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="w-full mt-4 md:mt-6"
+          >
+            <FlipHistory history={history} />
+          </motion.div>
         </div>
       </main>
+
+      <Footer />
 
       {/* Flip Modal */}
       <FlipModal
