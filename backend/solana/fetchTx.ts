@@ -12,13 +12,12 @@ export async function fetchTx(signature: string, escrowPubkey: PublicKey): Promi
     });
 
     if (!tx) {
-        return { txMetaData: { side: "", amount: 0, userId: "", userPubkey: null }, confirmed: false };
+        return { txMetaData: { side: "", amount: 0, userPubkey: null }, confirmed: false };
     }
 
     const data: txMetaData = {
         side: "",
         amount: 0,
-        userId: "",
         userPubkey: null,
     };
 
@@ -27,7 +26,7 @@ export async function fetchTx(signature: string, escrowPubkey: PublicKey): Promi
         (account) => account.pubkey.toBase58() === escrowPubkey.toBase58()
     );
     if (!verify) {
-        return { txMetaData: { side: "", amount: 0, userId: "", userPubkey: null }, confirmed: false };
+        return { txMetaData: { side: "", amount: 0, userPubkey: null }, confirmed: false };
     }
 
     // Extract the user's public key - the signer that is NOT the escrow
@@ -43,9 +42,8 @@ export async function fetchTx(signature: string, escrowPubkey: PublicKey): Promi
             // SPL memo's parsed value is always a string
             const memoString = ix.parsed as string;
             const memo = memoString.split("-");
-            data.side = memo[1] ?? "";
-            data.amount = Number(memo[2] ?? 0);
-            data.userId = memo[3] ?? "";
+            data.side = memo[0] ?? "";
+            data.amount = Number(memo[1] ?? 0);
         }
     }
     return { txMetaData: data, confirmed: true };
@@ -54,6 +52,5 @@ export async function fetchTx(signature: string, escrowPubkey: PublicKey): Promi
 export interface txMetaData {
     side: string;
     amount: number;
-    userId: string;
     userPubkey: PublicKey | null;
 }

@@ -4,19 +4,24 @@
   "type": "module",
   "private": true,
   "devDependencies": {
+    "@prisma/adapter-pg": "^7.2.0",
     "@types/bun": "latest",
-    "@types/cors": "^2.8.19"
+    "@types/cors": "^2.8.19",
+    "@types/pg": "^8.16.0",
+    "pg": "^8.16.3"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "dependencies": {
+    "@prisma/client": "^7.2.0",
     "@solana/spl-memo": "^0.2.5",
     "@solana/web3.js": "^1.98.4",
     "@types/express": "^5.0.6",
     "axios": "^1.13.2",
     "bs58": "^6.0.0",
     "cors": "^2.8.5",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "prisma": "^7.2.0"
   }
 }
