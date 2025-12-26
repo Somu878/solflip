@@ -23,6 +23,20 @@ model Bet {
   won            Boolean
   payoutSignature String?
   createdAt      DateTime @default(now())
+  transferId     Int?
+  transfer       Transfer? @relation(fields: [transferId], references: [id], onDelete: SetNull)
+}
+
+model Transfer {
+  id             Int      @id @default(autoincrement())
+  signature      String   @unique
+  fromPublicKey  String
+  amount         Float
+  memo           String?
+  status         String   @default("received")
+  statusReason   String?
+  createdAt      DateTime @default(now())
+  bets           Bet[]
 }
 
 
