@@ -5,6 +5,7 @@ import { fetchTx } from "./solana/fetchTx";
 import { ESCROW_PUBKEY } from "./config/wallet";
 import { ManageFlip } from "./game/flipManager";
 import { Side } from "./game/flip";
+import prisma from "./prisma/_client";
 
 
 const app = express();
@@ -24,6 +25,15 @@ app.post("/flip", async (req, res) => {
         res.status(500).json({ error: error as string });
     }
 
+})
+
+app.get("/bets", async (req, res) => {
+    try {
+        const bets = await prisma.bet.findMany();
+        res.json(bets);
+    } catch (error) {
+        res.status(500).json({ error: error as string });
+    }
 })
 
 

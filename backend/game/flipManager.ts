@@ -21,8 +21,8 @@ export async function ManageFlip(userFlipSide: Side, signature: string, userPubl
         if (!parseSignature.confirmed) {
             return { win: false, result: "Transaction not confirmed", winTxSignature: "" };
         }
-        const { side, amount } = parseSignature.txMetaData;
-        if (checkSignature && checkSignature.amount < amount) {
+        const { side, amount: txAmount } = parseSignature.txMetaData;
+        if (checkSignature && checkSignature.amount < txAmount) {
             return { win: false, result: "Transaction already processed", winTxSignature: "" };
         }
 

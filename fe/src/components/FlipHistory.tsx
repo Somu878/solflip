@@ -9,6 +9,8 @@ interface FlipRecord {
   result: 'heads' | 'tails';
   won: boolean;
   timestamp: Date;
+  signature?: string;
+  payoutSignature?: string | null;
 }
 
 interface FlipHistoryProps {
@@ -23,7 +25,7 @@ export const FlipHistory = ({ history }: FlipHistoryProps) => {
   const formatTime = (date: Date) => {
     const now = new Date();
     const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
-    
+
     if (diff < 60) return 'Just now';
     if (diff < 3600) return `${Math.floor(diff / 60)} mins ago`;
     if (diff < 86400) return `${Math.floor(diff / 3600)} hrs ago`;
@@ -44,11 +46,10 @@ export const FlipHistory = ({ history }: FlipHistoryProps) => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
               transition={{ delay: index * 0.05 }}
-              className={`flex items-center justify-between p-3 rounded-lg border ${
-                flip.won
+              className={`flex items-center justify-between p-3 rounded-lg border ${flip.won
                   ? 'bg-green-500/10 border-green-500/30'
                   : 'bg-red-500/10 border-red-500/30'
-              }`}
+                }`}
             >
               <div className="flex items-center gap-3">
                 {flip.won ? (
@@ -74,7 +75,7 @@ export const FlipHistory = ({ history }: FlipHistoryProps) => {
             </motion.div>
           ))}
         </AnimatePresence>
-        
+
         {history.length === 0 && (
           <div className="text-center py-8 text-muted-foreground">
             No flips yet. Be the first!

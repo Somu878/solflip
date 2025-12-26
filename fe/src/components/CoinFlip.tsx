@@ -12,16 +12,16 @@ export const CoinFlip = ({ isFlipping, result }: CoinFlipProps) => {
       <motion.div
         className="w-full h-full relative preserve-3d"
         animate={
-          isFlipping
-            ? { rotateY: [0, 1800] }
+          isFlipping || result === null
+            ? { rotateY: [0, 360] }
             : result === 'tails'
             ? { rotateY: 180 }
             : { rotateY: 0 }
         }
         transition={
-          isFlipping
-            ? { duration: 2, ease: 'easeInOut' }
-            : { duration: 0.3 }
+          isFlipping || result === null
+            ? { duration: 0.6, repeat: Infinity, ease: 'linear', repeatType: 'loop' }
+            : { duration: 0.5, ease: 'easeOut' }
         }
         style={{ transformStyle: 'preserve-3d' }}
       >

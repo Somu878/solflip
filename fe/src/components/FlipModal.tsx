@@ -73,7 +73,7 @@ export const FlipModal: FC<FlipModalProps> = ({ isOpen, flipStatus, result, choi
                 className="text-center space-y-2"
               >
                 <p className="text-muted-foreground text-sm uppercase tracking-wide">
-                  {flipStatus === 'flipping' ? 'Flipping...' : result ? 'Result' : 'Good luck!'}
+                  {flipStatus === 'flipping' ? 'Flipping...' : flipStatus === 'completed' ? 'Result' : 'Good luck!'}
                 </p>
                 <p className="text-foreground font-semibold text-lg">
                   Bet: <span className="text-primary font-mono">{amount} SOL</span> on{' '}

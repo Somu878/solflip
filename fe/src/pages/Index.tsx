@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { Header } from '@/components/Header';
@@ -10,7 +10,7 @@ import { FlipModal } from '@/components/FlipModal';
 import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import { createAndSignTransfer } from '@/services/solanaTransfer';
-import { submitFlip } from '@/services/flipApi';
+import { submitFlip, fetchBets, Bet } from '@/services/flipApi';
 import { useToast } from '@/hooks/use-toast';
 
 interface FlipRecord {
@@ -21,6 +21,8 @@ interface FlipRecord {
   result: 'heads' | 'tails';
   won: boolean;
   timestamp: Date;
+  signature?: string;
+  payoutSignature?: string | null;
 }
 
 const Index = () => {
@@ -35,6 +37,32 @@ const Index = () => {
   const [lastFlip, setLastFlip] = useState<{ won: boolean; amount: number; result: 'heads' | 'tails' } | null>(null);
   const [history, setHistory] = useState<FlipRecord[]>([]);
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
+
+  // Fetch bets from backend on mount
+  useEffect(() => {
+    const loadBets = async () => {
+      try {
+        const bets = await fetchBets();
+        const formattedBets: FlipRecord[] = bets.map((bet: Bet) => ({
+          id: bet.signature,
+          wallet: bet.playerPublicKey,
+          amount: bet.amount,
+          choice: bet.choice as 'heads' | 'tails',
+          result: bet.result as 'heads' | 'tails',
+          won: bet.won,
+          timestamp: new Date(bet.createdAt),
+          signature: bet.signature,
+          payoutSignature: bet.payoutSignature,
+        }));
+        // Sort by timestamp descending (most recent first)
+        formattedBets.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+        setHistory(formattedBets.slice(0, 20));
+      } catch (error) {
+        console.error('Failed to fetch bets:', error);
+      }
+    };
+    loadBets();
+  }, []);
 
   const handleFlip = useCallback(async (amount: number, choice: 'heads' | 'tails') => {
     if (!publicKey || !signTransaction) return;
@@ -66,29 +94,32 @@ const Index = () => {
       const result = flipResponse.result;
       const won = flipResponse.win;
 
-      setCoinResult(result);
-      setFlipStatus('completed');
-
-      // Add to history
-      const newRecord: FlipRecord = {
-        id: Date.now().toString(),
-        wallet: publicKey.toBase58(),
-        amount,
-        choice,
-        result,
-        won,
-        timestamp: new Date(),
-      };
-
-      setHistory(prev => [newRecord, ...prev].slice(0, 20));
-
-      // Show result modal after a short delay
+      // Keep spinning for a bit to build anticipation, then show result
       setTimeout(() => {
-        setShowFlipModal(false);
-        setFlipStatus('idle');
-        setLastFlip({ won, amount: won ? amount * 0.97 : amount, result });
-        setShowResult(true);
-      }, 1000);
+        setCoinResult(result);
+        setFlipStatus('completed');
+
+        // Add to history after result is shown
+        const newRecord: FlipRecord = {
+          id: Date.now().toString(),
+          wallet: publicKey.toBase58(),
+          amount,
+          choice,
+          result,
+          won,
+          timestamp: new Date(),
+        };
+
+        setHistory(prev => [newRecord, ...prev].slice(0, 20));
+
+        // Show result modal after animation completes
+        setTimeout(() => {
+          setShowFlipModal(false);
+          setFlipStatus('idle');
+          setLastFlip({ won, amount: won ? amount * 0.97 : amount, result });
+          setShowResult(true);
+        }, 1500);
+      }, 1500);
     } catch (error) {
       console.error('Flip error:', error);
       setFlipStatus('idle');
